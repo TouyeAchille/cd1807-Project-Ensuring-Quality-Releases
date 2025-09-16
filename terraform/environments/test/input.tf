@@ -5,12 +5,32 @@ variable "client_secret" {}
 variable "tenant_id" {}
 
 # Resource Group/Location
-variable "location" {}
-variable "resource_group" {}
-variable "application_type" {}
+variable "location" {
+    type = string
+    description = "Azure location where resources will be created"
+    
+}
+variable "resource_group_name" {
+    type = string
+    description = "value of existing resource group name"
+}
+variable "application_type" {
+    type = string
+    description = "Type of application to be deployed"
 
-# Network
-variable virtual_network_name {}
-variable address_prefix_test {}
-variable address_space {}
+}
+
+# Network   
+variable virtual_network_name {
+    type = string
+    description = "Name of the Virtual Network"
+}
+variable address_prefix_test {
+    type = list(string)
+    description = "The address prefix to use for the subnet."
+}
+variable address_space {
+    type = list(string)
+    description = "The address space that is used by the virtual network."
+}
 
