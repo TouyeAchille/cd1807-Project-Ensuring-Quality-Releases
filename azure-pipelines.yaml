@@ -16,7 +16,7 @@ variables:
   tfWorkingDirectory: '$(System.DefaultWorkingDirectory)/terraform/environments/test'
   azureRg: 'Azuredevops' 
   containerName: 'tfstate' 
-  storageAccountName: '"' 
+  storageAccountName: 'tfstate87207196' 
   blobname: 'test.terraform.tfstate'
   # Environment name
   environmentName: 'test'
@@ -51,11 +51,7 @@ stages:
         backendAzureRmKey: '$(blobname)'
 
      # Run Terraform Validate
-    - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV3@3
-      displayName: Terraform fmt
-      inputs:
-        provider: 'azurerm'
-        command: 'fmt'    
+  
     
     # Run Terraform Validate
     - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV3@3

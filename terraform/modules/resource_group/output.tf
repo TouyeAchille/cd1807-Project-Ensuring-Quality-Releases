@@ -1,6 +1,6 @@
-output "resource_group_name" {
+output "rg_name" {
   value = "${data.azurerm_resource_group.test.name}"
 }
-output "resource_group_location" {
+output "rg_location" {
   value = "${data.azurerm_resource_group.test.location}"
 }
