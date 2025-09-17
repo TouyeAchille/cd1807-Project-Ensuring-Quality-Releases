@@ -30,34 +30,39 @@ stages:
   - job: BuildInfrastructure
     steps:
     #--------------------------------------------#  
-    # Use Terraform to create the Infrastructure      
-    # Install Terraform on the pipeline agent 
-    - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
-      displayName: 'Terrafom installation'
-      inputs:
-        terraformVersion: '1.13.2'
-    
-    # Run Terraform Init on the pipeline agent 
-    - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV3@3
-      displayName: 'Terrafom init'
-      inputs:
-        provider: 'azurerm'
-        command: 'init'
-        workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/environments/test'
-        backendServiceArm: '$(azureServiceConnectionId)'
-        backendAzureRmResourceGroupName: '$(azureRg)'
-        backendAzureRmStorageAccountName: '$(storageAccountName)'
-        backendAzureRmContainerName: '$(containerName)'
-        backendAzureRmKey: '$(blobname)'
+      - script: |
+          sudo apt-get update
+          sudo apt-get install -y unzip
+        displayName: 'Install unzip'
+
+      # Use Terraform to create the Infrastructure      
+      # Install Terraform on the pipeline agent 
+      - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
+        displayName: 'Terrafom installation'
+        inputs:
+          terraformVersion: '1.13.2'
       
- 
-    
-    # Run Terraform Validate
-    - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV3@3
-      displayName: Terraform validate
-      inputs:
-        provider: 'azurerm'
-        command: 'validate'
+      # Run Terraform Init on the pipeline agent 
+      - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV3@3
+        displayName: 'Terrafom init'
+        inputs:
+          provider: 'azurerm'
+          command: 'init'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/environments/test'
+          backendServiceArm: '$(azureServiceConnectionId)'
+          backendAzureRmResourceGroupName: '$(azureRg)'
+          backendAzureRmStorageAccountName: '$(storageAccountName)'
+          backendAzureRmContainerName: '$(containerName)'
+          backendAzureRmKey: '$(blobname)'
+        
+  
+      
+      # Run Terraform Validate
+      - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV3@3
+        displayName: Terraform validate
+        inputs:
+          provider: 'azurerm'
+          command: 'validate'
 
     # OPTIONAL - This step is needed only if your Terraform VM uses an SSH key pair for login and you want your pipeline agent to connect to it. 
     # Generate an SSH key pair in your local/AZ Cloud shell. Use the public key in the Terraform VM module. 
@@ -77,13 +82,13 @@ stages:
 
     
     # Run Terraform Apply
-    - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV3@3
-      displayName: Terraform apply
-      inputs:
-        provider: 'azurerm'
-        command: 'apply'
-        workingDirectory: '$(tfWorkingDirectory)'
-        environmentServiceNameAzureRM: '$(azureServiceConnectionId)'
+      - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV3@3
+        displayName: Terraform apply
+        inputs:
+          provider: 'azurerm'
+          command: 'apply'
+          workingDirectory: '$(tfWorkingDirectory)'
+          environmentServiceNameAzureRM: '$(azureServiceConnectionId)'
 
 
     # ToDo: Change the workingDirectory path, as applicable to you
