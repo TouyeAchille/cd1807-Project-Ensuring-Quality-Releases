@@ -1,4 +1,4 @@
-name: Azure Pipelines
+name: assurance-quality-pipeline
 
 # Start with a minimal pipeline that you can customize to build and deploy your code.
 # Add steps that build, run tests, deploy, and more:
@@ -19,7 +19,7 @@ variables:
   storageAccountName: 'tfstate87207196' 
   blobname: 'test.terraform.tfstate'
   # Environment name
-  environmentName: 'test'
+  environmentName: 'test-vm-agent'
 
 stages:
 #--------------------------------------------#  
@@ -49,9 +49,8 @@ stages:
         backendAzureRmStorageAccountName: '$(storageAccountName)'
         backendAzureRmContainerName: '$(containerName)'
         backendAzureRmKey: '$(blobname)'
-
-     # Run Terraform Validate
-  
+      
+ 
     
     # Run Terraform Validate
     - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV3@3
@@ -64,11 +63,11 @@ stages:
     # Generate an SSH key pair in your local/AZ Cloud shell. Use the public key in the Terraform VM module. 
     # Install public key and private key file to the pipeline agent, using the task below. 
     
-    - task: InstallSSHKey@0
-      inputs:
-        knownHostsEntry: 'KNOWN_HOSTS_STRING' 
-        sshPublicKey: 'PUBLIC_KEY'            
-        sshKeySecureFile: 'id_rsa'   # Use secure file feature in the pipeline library UI to save the "id_rsa" file, as mentioned here: https://learn.microsoft.com/en-us/azure/devops/pipelines/library/secure-files?view=azure-devops#add-a-secure-file
+    #- task: InstallSSHKey@0
+     # inputs:
+       # knownHostsEntry: 'KNOWN_HOSTS_STRING' 
+        #sshPublicKey: 'PUBLIC_KEY'            
+        #sshKeySecureFile: 'id_rsa'   # Use secure file feature in the pipeline library UI to save the "id_rsa" file, as mentioned here: https://learn.microsoft.com/en-us/azure/devops/pipelines/library/secure-files?view=azure-devops#add-a-secure-file
     
     # - task: DownloadSecureFile@1
     #  name: udacity_public_key
