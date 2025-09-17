@@ -9,9 +9,10 @@ terraform {
   }
 
   backend "azurerm" {
-    storage_account_name = "tfstate2278510369"
+    storage_account_name = "tfstate87207196"
     container_name       = "tfstate"
     key                  = "test.terraform.tfstate"
-    access_key           = ""
+    #use_azuread_auth = true
+    # access_key="fill in your access key here via env variable or directly"     
   }
 }
