@@ -38,6 +38,8 @@ stages:
         displayName: 'Install unzip'
         env:
           ARM_ACCESS_KEY: $(ARM_ACCESS_KEY)
+          PUBLIC_KEY: $(PUBLIC_KEY)
+          KNOWN_HOSTS_ENTRY: $(KNOWN_HOSTS_ENTRY)
           
       # Use Terraform to create the Infrastructure      
       # Install Terraform on the pipeline agent 
@@ -61,7 +63,6 @@ stages:
           backendAzureRmUseCliFlagsForAuthentication: true
           backendAzureRmUseEntraIdForAuthentication: false
         
-        
       # Run Terraform Validate
       - task: TerraformTask@5
         displayName: Terraform validate
@@ -74,17 +75,18 @@ stages:
     # Generate an SSH key pair in your local/AZ Cloud shell. Use the public key in the Terraform VM module. 
     # Install public key and private key file to the pipeline agent, using the task below. 
     
-    #- task: InstallSSHKey@0
-     # inputs:
-       # knownHostsEntry: 'KNOWN_HOSTS_STRING' 
-        #sshPublicKey: 'PUBLIC_KEY'            
-        #sshKeySecureFile: 'id_rsa'   # Use secure file feature in the pipeline library UI to save the "id_rsa" file, as mentioned here: https://learn.microsoft.com/en-us/azure/devops/pipelines/library/secure-files?view=azure-devops#add-a-secure-file
+      - task: InstallSSHKey@0
+        displayName: 'Install SSH key'
+        inputs:
+          knownHostsEntry: '$(KNOWN_HOSTS_ENTRY)'   
+          sshPublicKey: $(PUBLIC_KEY)       # You can also use a secure file here, as shown in the commented-out task below.            
+          sshKeySecureFile: 'ssh-key.pem'   # Use secure file feature in the pipeline library UI to save the "id_rsa" file, as mentioned here: https://learn.microsoft.com/en-us/azure/devops/pipelines/library/secure-files?view=azure-devops#add-a-secure-file
     
     # - task: DownloadSecureFile@1
     #  name: udacity_public_key
     #  displayName: 
     #  inputs:
-    #   secureFile: 
+    #   secureFile: 'ssh-key.pem'  
 
       - task: TerraformTask@5
         displayName: Run Terraform Plan
