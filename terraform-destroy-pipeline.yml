@@ -43,5 +43,5 @@ stages:
         provider: 'azurerm'
         command: 'destroy'
         workingDirectory: $(tfWorkingDirectory)
-        commandOptions: '-auto-approve'
+        commandOptions: '-auto-approve --var="ssh_public_key=$(PUBLIC_KEY)"'
         environmentServiceNameAzureRM: '$(azureServiceConnectionId)'
