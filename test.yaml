@@ -9,17 +9,18 @@ trigger:
 pool: myAgentPool
 
 variables:
-  python.version: '3.7.6'
+  python.version: '3.12.3'
   azureServiceConnectionId: 'myServiceConnection'
   # Project root folder. Point to the folder containing manage.py file.
   projectRoot: $(System.DefaultWorkingDirectory)
   tfWorkingDirectory: '$(System.DefaultWorkingDirectory)/terraform/environments/test'
   azureRg: 'Azuredevops' 
   containerName: 'tfstate' 
-  storageAccountName: 'tfstate87207196' 
+  storageAccountName: tfstate184604487'
   blobname: 'test.terraform.tfstate'
   # Environment name
-  environmentName: 'test-vm-agent'
+  environmentName: 'test-vm'
+  ARM_ACCESS_KEY: $(ARM_ACCESS_KEY)
 
 stages:
 #--------------------------------------------#  
@@ -31,6 +32,7 @@ stages:
     steps:
     #--------------------------------------------#  
       - script: |
+          echo  $(ARM_ACCESS_KEY)
           sudo apt-get update
           sudo apt-get install -y unzip
         displayName: 'Install unzip'
