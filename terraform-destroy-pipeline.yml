@@ -43,5 +43,5 @@ stages:
         provider: 'azurerm'
         command: 'destroy'
         workingDirectory: $(tfWorkingDirectory)
-        commandOptions: '-auto-approve --var="ssh_public_key=$(PUBLIC_KEY)"'
+        commandOptions: '-var-file=terraform.tfvars --var="ssh_public_key=$(SSH_PUBLIC_KEY)"'
         environmentServiceNameAzureRM: '$(azureServiceConnectionId)'
