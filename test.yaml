@@ -21,6 +21,9 @@ variables:
   # Environment name
   environmentName: 'test-vm'
 
+env:
+  ARM_ACCESS_KEY: $(ARM_ACCESS_KEY)
+
 stages:
 #--------------------------------------------#  
 # BUILD STAGE
