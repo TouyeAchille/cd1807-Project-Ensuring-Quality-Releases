@@ -21,8 +21,6 @@ variables:
   # Environment name
   environmentName: 'test-vm'
 
-env:
-  ARM_ACCESS_KEY: $(ARM_ACCESS_KEY)
 
 stages:
 #--------------------------------------------#  
@@ -38,6 +36,8 @@ stages:
           sudo apt-get update
           sudo apt-get install -y unzip
         displayName: 'Install unzip'
+        env:
+          ARM_ACCESS_KEY: $(ARM_ACCESS_KEY)
 
       # Use Terraform to create the Infrastructure      
       # Install Terraform on the pipeline agent 
