@@ -16,12 +16,11 @@ variables:
   tfWorkingDirectory: '$(System.DefaultWorkingDirectory)/terraform/environments/test'
   azureRg: 'Azuredevops' 
   containerName: 'tfstate' 
-  storageAccountName: tfstate184604487'
+  storageAccountName: "tfstate184604487"
   blobname: 'test.terraform.tfstate'
   # Environment name
   environmentName: 'test-vm'
-  ARM_ACCESS_KEY: $(ARM_ACCESS_KEY)
-
+  
 stages:
 #--------------------------------------------#  
 # BUILD STAGE
