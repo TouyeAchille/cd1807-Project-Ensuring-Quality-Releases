@@ -111,11 +111,11 @@ stages:
 
     # ToDo: Change the workingDirectory path, as applicable t
     # Destroy the resources in Azure by running a separate pipeline. 
-    # - task: TerraformTask@5
-    #   displayName: Terraform destroy
-    #   inputs:
-    #     provider: 'azurerm'
-    #     command: 'destroy'
-    #     workingDirectory: $(tfWorkingDirectory)
-    #     environmentServiceNameAzureRM: '$(azureServiceConnectionId)'
+      - task: TerraformTask@5
+        displayName: Terraform destroy
+        inputs:
+          provider: 'azurerm'
+          command: 'destroy'
+          workingDirectory: $(tfWorkingDirectory)
+          environmentServiceNameAzureRM: '$(azureServiceConnectionId)'
 
