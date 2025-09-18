@@ -62,8 +62,6 @@ stages:
           backendAzureRmUseEntraIdForAuthentication: false
         
         
-  
-      
       # Run Terraform Validate
       - task: TerraformTask@5
         displayName: Terraform validate
@@ -94,6 +92,7 @@ stages:
             provider: 'azurerm'
             command: 'plan'
             commandOptions: '-out tfplan'
+            workingDirectory: '$(tfWorkingDirectory)'
             environmentServiceNameAzureRM: '$(azureServiceConnectionId)'
             # Run Terraform Apply
 
@@ -107,13 +106,13 @@ stages:
           environmentServiceNameAzureRM: '$(azureServiceConnectionId)'
 
 
-    # ToDo: Change the workingDirectory path, as applicable to you
+    # ToDo: Change the workingDirectory path, as applicable t
     # Destroy the resources in Azure by running a separate pipeline. 
-    # - task: TerraformTaskV@5
+    # - task: TerraformTask@5
     #   displayName: Terraform destroy
     #   inputs:
     #     provider: 'azurerm'
     #     command: 'destroy'
-    #     workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/environments/test'
+    #     workingDirectory: $(tfWorkingDirectory)
     #     environmentServiceNameAzureRM: '$(azureServiceConnectionId)'
 
