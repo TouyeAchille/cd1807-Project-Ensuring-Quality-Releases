@@ -36,10 +36,10 @@ stages:
           sudo apt-get install -y unzip
           echo "acces keys :$(ARM_ACCESS_KEY)" 
         displayName: 'Install unzip'
-        env:
-          ARM_ACCESS_KEY: $(ARM_ACCESS_KEY)
-          PUBLIC_KEY: $(PUBLIC_KEY)
-          KNOWN_HOSTS_ENTRY: $(KNOWN_HOSTS_ENTRY)
+        #env:
+          #ARM_ACCESS_KEY: $(ARM_ACCESS_KEY)
+         # PUBLIC_KEY: $(PUBLIC_KEY)
+          #KNOWN_HOSTS_ENTRY: $(KNOWN_HOSTS_ENTRY)
           
       # Use Terraform to create the Infrastructure      
       # Install Terraform on the pipeline agent 
@@ -79,7 +79,7 @@ stages:
         displayName: 'Install SSH key'
         inputs:
           knownHostsEntry: '$(KNOWN_HOSTS_ENTRY)'   
-          sshPublicKey: $(PUBLIC_KEY)       # You can also use a secure file here, as shown in the commented-out task below.            
+          sshPublicKey: '$(SSH_PUBLIC_KEY)'  # Use the public key generated in your local/AZ Cloud shell          
           sshKeySecureFile: 'ssh-key.pem'   # Use secure file feature in the pipeline library UI to save the "id_rsa" file, as mentioned here: https://learn.microsoft.com/en-us/azure/devops/pipelines/library/secure-files?view=azure-devops#add-a-secure-file
     
     # - task: DownloadSecureFile@1
@@ -93,7 +93,10 @@ stages:
         inputs:
             provider: 'azurerm'
             command: 'plan'
-            commandOptions: '-out tfplan -var="ssh_public_key=$(PUBLIC_KEY)"'
+            commandOptions: >
+              -out=tfplan 
+              -var="ssh_public_key=$(SSH_PUBLIC_KEY)" 
+              #-var-file='terraform.tfvars'
             workingDirectory: '$(tfWorkingDirectory)'
             environmentServiceNameAzureRM: '$(azureServiceConnectionId)'
 
@@ -116,6 +119,7 @@ stages:
         inputs:
           provider: 'azurerm'
           command: 'destroy'
+          commandOptions: '-auto-approve'
           workingDirectory: $(tfWorkingDirectory)
           environmentServiceNameAzureRM: '$(azureServiceConnectionId)'
 
