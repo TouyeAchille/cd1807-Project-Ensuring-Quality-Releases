@@ -35,3 +35,7 @@ variable "address_space" {
   description = "The address space that is used by the virtual network."
 }
 
+variable "ssh_public_key" {
+  type        = string
+  description = "SSH public key for admin access"
+}

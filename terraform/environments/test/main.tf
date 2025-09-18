@@ -49,4 +49,5 @@ module "vm" {
   resource_group_name  = module.resource_group.rg_name
   subnet_id            = module.network.subnet_id_test
   public_ip_address_id = module.publicip.public_ip_address_id
+  ssh_public_key       = var.ssh_public_key
 }

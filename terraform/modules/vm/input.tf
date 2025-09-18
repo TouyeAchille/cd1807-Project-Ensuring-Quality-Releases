@@ -23,3 +23,7 @@ variable "public_ip_address_id" {
     type=string     
     description="The ID of the Public IP Address to associate with the Network Interface."
 }
+variable "ssh_public_key" {
+  type        = string
+  description = "SSH public key for admin access"
+}

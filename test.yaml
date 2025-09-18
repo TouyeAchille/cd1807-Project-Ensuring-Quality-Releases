@@ -96,6 +96,8 @@ stages:
             commandOptions: '-out tfplan'
             workingDirectory: '$(tfWorkingDirectory)'
             environmentServiceNameAzureRM: '$(azureServiceConnectionId)'
+            vars: |
+              ssh_public_key=$(PUBLIC_KEY)
             # Run Terraform Apply
 
       - task: TerraformTask@5
