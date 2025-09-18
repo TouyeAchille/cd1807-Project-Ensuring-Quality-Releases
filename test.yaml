@@ -34,10 +34,11 @@ stages:
       - script: |
           sudo apt-get update
           sudo apt-get install -y unzip
+          echo "$ARM_ACCESS_KEY" 
         displayName: 'Install unzip'
         env:
           ARM_ACCESS_KEY: $(ARM_ACCESS_KEY)
-
+          
       # Use Terraform to create the Infrastructure      
       # Install Terraform on the pipeline agent 
       - task: TerraformInstaller@1
@@ -57,7 +58,7 @@ stages:
           backendAzureRmStorageAccountName: '$(storageAccountName)'
           backendAzureRmContainerName: '$(containerName)'
           backendAzureRmKey: '$(blobname)'
-          backendAzureRmAccessKey: '$(ARM_ACCESS_KEY)'
+        
         
   
       

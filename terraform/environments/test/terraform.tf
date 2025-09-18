@@ -12,7 +12,7 @@ terraform {
     storage_account_name = "tfstate184604487"
     container_name       = "tfstate"
     key                  = "test.terraform.tfstate"
-    use_azuread_auth = False
+    use_azuread_auth     = true
     # access_key="fill in your access key here via env variable or directly"     
   }
 }
