@@ -34,7 +34,7 @@ stages:
       - script: |
           sudo apt-get update
           sudo apt-get install -y unzip
-          echo "$ARM_ACCESS_KEY" 
+          echo "acces keys :$(ARM_ACCESS_KEY)" 
         displayName: 'Install unzip'
         env:
           ARM_ACCESS_KEY: $(ARM_ACCESS_KEY)
@@ -58,6 +58,8 @@ stages:
           backendAzureRmStorageAccountName: '$(storageAccountName)'
           backendAzureRmContainerName: '$(containerName)'
           backendAzureRmKey: '$(blobname)'
+          backendAzureRmUseCliFlagsForAuthentication: true
+          backendAzureRmUseEntraIdForAuthentication: false
         
         
   
