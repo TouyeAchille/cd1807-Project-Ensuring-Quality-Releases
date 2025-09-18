@@ -32,7 +32,6 @@ stages:
     steps:
     #--------------------------------------------#  
       - script: |
-          echo  '$(ARM_ACCESS_KEY)'
           sudo apt-get update
           sudo apt-get install -y unzip
         displayName: 'Install unzip'
