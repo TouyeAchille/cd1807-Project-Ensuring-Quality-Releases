@@ -93,9 +93,7 @@ stages:
         inputs:
             provider: 'azurerm'
             command: 'plan'
-            commandOptions: >
-              -out=tfplan 
-              -var="ssh_public_key=$(SSH_PUBLIC_KEY)" 
+            commandOptions: -out=tfplan -var="ssh_public_key=$(SSH_PUBLIC_KEY)" 
               #-var-file='terraform.tfvars'
             workingDirectory: '$(tfWorkingDirectory)'
             environmentServiceNameAzureRM: '$(azureServiceConnectionId)'
