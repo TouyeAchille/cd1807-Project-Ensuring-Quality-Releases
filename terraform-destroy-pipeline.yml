@@ -1,6 +1,6 @@
 name: terraform-destroy-pipeline
 
-trigger: none  # Manual only!
+trigger: none  # Manual only! (no CI trigger, Human intervention required)
 
 pool:
   name: myAgentPool

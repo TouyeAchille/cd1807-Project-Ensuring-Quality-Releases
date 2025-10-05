@@ -14,6 +14,7 @@ variables:
   # Project root folder. Point to the folder containing manage.py file.
   projectRoot: $(System.DefaultWorkingDirectory)
   tfWorkingDirectory: '$(System.DefaultWorkingDirectory)/terraform/environments/test'
+  postmanWorkingDirectory: '$(System.DefaultWorkingDirectory)/automatedtesting/postman'
   azureRg: 'Azuredevops' 
   containerName: 'tfstate' 
   storageAccountName: 'tfstate87207196' 
@@ -106,6 +107,7 @@ stages:
       inputs:
         script: 'sudo npm install -g newman'
         workingDirectory: $(System.DefaultWorkingDirectory)
+
     # Postman Data Validation Test Suite    
     # ToDo: Verify the working directory
     - task: CmdLine@2
@@ -113,6 +115,7 @@ stages:
       continueOnError: true
       inputs:
         script: 'newman run TestSuite.Data-Validation.json -e Test.environment.json --reporters cli,junit --reporter-junit-export TEST-DataValidation.xml'
+        
         workingDirectory: '$(System.DefaultWorkingDirectory)/automatedtesting/postman'
     # Postman Regression Test Suite    
     # ToDo: Verify the working directory

@@ -14,6 +14,12 @@ variables:
   # Project root folder
   projectRoot: $(System.DefaultWorkingDirectory)
   tfWorkingDirectory: '$(System.DefaultWorkingDirectory)/terraform/environments/test'
+  postmanWorkingDirectory: '$(System.DefaultWorkingDirectory)/automatedtesting/postman'
+  seleniumWorkingDirectory: '$(System.DefaultWorkingDirectory)/automatedtesting/selenium'
+  jmeterWorkingDirectory: '$(System.DefaultWorkingDirectory)/automatedtesting/jmeter/test-suite'
+  fakerestapiWorkingDirectory: '$(System.DefaultWorkingDirectory)/automatedtesting/jmeter/fakerestapi'
+  webAppName: "Webapp-AppService-app"
+  # Terraform backend configuration
   azureRg: 'Azuredevops' 
   containerName: 'tfstate' 
   storageAccountName: "tfstate184604487"
@@ -26,17 +32,17 @@ stages:
 #--------------------------------------------#  
 # BUILD STAGE
 #--------------------------------------------#    
+
 - stage: Build
   jobs:
   - job: BuildInfrastructure
     steps:
-    #--------------------------------------------#  
+      # Install unzip on the pipeline agent
       - script: |
           sudo apt-get update
           sudo apt-get install -y unzip
         displayName: 'Install unzip'
 
-      # Use Terraform to create the Infrastructure      
       # Install Terraform on the pipeline agent 
       - task: TerraformInstaller@1
         displayName: 'Terrafom installation'
@@ -58,7 +64,7 @@ stages:
           backendAzureRmUseCliFlagsForAuthentication: true
           backendAzureRmUseEntraIdForAuthentication: false
         
-      # Run Terraform Validate
+      # Run Terraform Validate on the pipeline agent
       - task: TerraformTask@5
         displayName: Terraform validate
         inputs:
@@ -76,21 +82,15 @@ stages:
           knownHostsEntry: '$(KNOWN_HOSTS_ENTRY)'   
           sshPublicKey: '$(SSH_PUBLIC_KEY)'  # Use the public key generated in your local/AZ Cloud shell          
           sshKeySecureFile: 'ssh-key.pem'   # Use secure file feature in the pipeline library UI to save the "id_rsa" file, as mentioned here: https://learn.microsoft.com/en-us/azure/devops/pipelines/library/secure-files?view=azure-devops#add-a-secure-file
-    
-    # - task: DownloadSecureFile@1
-    #  name: udacity_public_key
-    #  displayName: 
-    #  inputs:
-    #   secureFile: 'ssh-key.pem'  
 
       - task: TerraformTask@5
         displayName: Run Terraform Plan
         inputs:
-            provider: 'azurerm'
-            command: 'plan'
-            commandOptions: -out=tfplan -var="ssh_public_key=$(SSH_PUBLIC_KEY)" -var-file=terraform.tfvars
-            workingDirectory: '$(tfWorkingDirectory)'
-            environmentServiceNameAzureRM: '$(azureServiceConnectionId)'
+          provider: 'azurerm'
+          command: 'plan'
+          commandOptions: -out=tfplan -var="ssh_public_key=$(SSH_PUBLIC_KEY)" -var-file=terraform.tfvars
+          workingDirectory: '$(tfWorkingDirectory)'
+          environmentServiceNameAzureRM: '$(azureServiceConnectionId)'
 
             # Run Terraform Apply
 
@@ -103,5 +103,174 @@ stages:
           workingDirectory: '$(tfWorkingDirectory)'
           environmentServiceNameAzureRM: '$(azureServiceConnectionId)'
 
+# postman component
+  - job: CreatePostmanTests
+    steps:
+      # Postman - Install Newman    
+        - task: CmdLine@2
+          displayName: Install Newman and JUnitFull reporter
+          inputs:
+            script: |
+               'sudo npm install -g newman'
+               'echo "Newman version: $(newman --version)"'
+               'sudo npm install -g newman-reporter-junitfull'
+               
+            workingDirectory: $(System.DefaultWorkingDirectory)
 
+      # Postman Data Validation Test Suite    
+        - task: CmdLine@2
+          displayName: Run Data Validation Tests
+          continueOnError: true
+          inputs:
+            script: 'newman run TestSuite.Data-Validation.json -e Test.environment.json --reporters cli,junit --reporter-junit-export TEST-DataValidation.xml'
+            workingDirectory: "$(postmanWorkingDirectory)"
+
+        # Postman Regression Test Suite    
+        - task: CmdLine@2
+          displayName: Run Regression Tests
+          continueOnError: true
+          inputs:
+            script: 'newman run TestSuite.Regression.json -e Test.environment.json --reporters cli,junit --reporter-junit-export TEST-Regression.xml'
+            workingDirectory: '$(postmanWorkingDirectory)'
+
+        # Postman - Publish TEST Results - JUnit format
+        - task: PublishTestResults@2
+          displayName: 'Publish Postman Test Results'
+          condition: always()
+          inputs:
+            testResultsFormat: 'JUnit'
+            testResultsFiles: '**/TEST-*.xml'
+            failTaskOnFailedTests: true
+            searchFolder: '$(postmanWorkingDirectory)'
+            mergeTestResults: true
+            testRunTitle: 'Postman Test Suite Results'
+
+# archivefiles
+  - job: ArchiveFiles(Selenium,JMeter,FakeRestAPI) and Publish Artifacts
+    steps:
+    # Selenium (UI) Test Suite - Archive the package  
+    # "ArchiveFiles@2" picks up the web package and archives it.
+      - task: ArchiveFiles@2
+        displayName: 'Archive UI Tests'
+        inputs:
+          rootFolderOrFile: '$(seleniumWorkingDirectory)'
+          includeRootFolder: false
+          archiveType: 'zip'
+          archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-uitests.zip'
+
+      # Selenium Test Suite - Publish the package  
+      - publish: $(Build.ArtifactStagingDirectory)/$(Build.BuildId)-uitests.zip   # Same as the archiveFile artifact above. 
+        displayName: 'Upload Package for UI Tests'
+        artifact: drop-uitests
+
+      # FakeRestAPI - Archive
+      - task: ArchiveFiles@2
+        displayName: 'Archive FakeRestAPI'
+        inputs:
+          rootFolderOrFile: '$(fakerestapiWorkingDirectory)' 
+          includeRootFolder: false
+          archiveType: 'zip'
+          archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-fakerestapi.zip'
+
+      - publish: $(Build.ArtifactStagingDirectory)/$(Build.BuildId)-fakerestapi.zip
+        displayName: 'Upload Package for FakeRestAPI'
+        artifact: drop-fakerestapi
+
+      # JMeter (Performance) Test Suite - Archive
+      - task: ArchiveFiles@2
+        displayName: 'Archive PerformanceTestSuite'
+        inputs:
+          rootFolderOrFile: '$(jmeterWorkingDirectory)'
+          includeRootFolder: false
+          archiveType: 'zip'
+          archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-perftests.zip'
+
+      # JMeter Test Suite - Publish    
+      - publish: $(Build.ArtifactStagingDirectory)/$(Build.BuildId)-perftests.zip
+        displayName: 'Upload Package  for PerformanceTestSuite'
+        artifact: drop-perftests
+      
+
+    
+#--------------------------------------------#  
+# DEPLOYMENT STAGE
+#--------------------------------------------#    
+
+- stage: Deploy
+  jobs:
+  # Deploy FakeRestAPI Web App : Paas
+  - deployment: FakeRestAPI
+    pool: myAgentPool
+    displayName: Deploy FakeRestAPI      
+    environment: '$(environmentName)'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: AzureWebApp@1
+            displayName: 'Deploy Azure Web App'
+            inputs:
+              azureSubscription: '$(azureServiceConnectionId)' 
+              appName: '$(webAppName)'       
+              appType: webApp
+              package: $(Pipeline.Workspace)/drop-fakerestapi/$(Build.BuildId)-fakerestapi.zip       
+          
+          # Run JMeter test suite against the App Service
+          #- task: CmdLine@2
+           # inputs:
+            #  script: |
+              #  wget "https://apache.mirrors.lucidnetworks.net//jmeter/binaries/apache-jmeter-5.2.1.tgz"
+               # tar -xf apache-jmeter-5.2.1.tgz
+               # unzip -o $(Build.BuildId)-perftests.zip
+               # ./apache-jmeter-5.2.1/bin/jmeter -n -t PerformanceTestSuite.jmx -j jmeter.log -f
+                #cat jmeter.log                                                                           # ToDo: Write your commands
+              #workingDirectory: $(Pipeline.Workspace)/<artifact>            # ToDo: Use the artifact name from the task above
+              
+  #--------------------------------------------#  
+  # Selenium | Functional UI Tests
+  - deployment: VMDeploy
+    displayName: Selenium Tests
+    environment:
+      name:  "webapp-VM"       
+      resourceType: VirtualMachine
+      tags: selenium
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: drop-uitests     
+            
+          - task: Bash@3
+            inputs:
+              targetType: 'inline'
+              script: |           
+                #! /bin/bash
+                
+                sudo apt-get upgrade -y
+                sudo apt-get install python3-pip -y
+                sudo apt-get install unzip -y
+                sudo apt-get install -y chromium-browser
+                pip3 install selenium pytest
+                cd ~/
+                DIR=/home/mbogolta/app
+                if [ ! -d "$DIR" ]; then
+                    mkdir app
+                fi
+                mv /home/mbogolta/azagent/_work/1/drop-uitests/$(Build.BuildId)-uitests.zip app
+                cd app
+                unzip -o $(Build.BuildId)-uitests.zip
+                FILE=/home/mbogolta/app/chromedriver_linux64.zip
+                if [ ! -f "$FILE" ]; then
+                    LATEST=$(wget -q -O - http://chromedriver.storage.googleapis.com/LATEST_RELEASE)
+                    wget http://chromedriver.storage.googleapis.com/$LATEST/chromedriver_linux64.zip
+                    unzip -o chromedriver_linux64.zip
+                    sudo ln -s $PWD/chromedriver /usr/local/bin/chromedriver
+                fi
+                export PATH=$PATH:/home/mbogolta/app
+                echo "Starting Selenium Tests"
+                python3 login.py >> selenium.log
+                echo "Completed Selenium Tests. Check selenium.log for results."
+
+  
 
