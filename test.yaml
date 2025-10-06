@@ -19,11 +19,13 @@ variables:
   jmeterWorkingDirectory: '$(System.DefaultWorkingDirectory)/automatedtesting/jmeter/test-suite'
   fakerestapiWorkingDirectory: '$(System.DefaultWorkingDirectory)/automatedtesting/jmeter/fakerestapi'
   webAppName: "Webapp-AppService-app"
+
   # Terraform backend configuration
   azureRg: 'Azuredevops' 
   containerName: 'tfstate' 
-  storageAccountName: "tfstate184604487"
+  storageAccountName: "tfstate12236946"
   blobname: 'test.terraform.tfstate'
+
   # Environment name
   environmentName: 'test-vm'
 
