@@ -14,7 +14,7 @@ variables:
   # Project root folder
   projectRoot: $(System.DefaultWorkingDirectory)
   tfWorkingDirectory: '$(System.DefaultWorkingDirectory)/terraform/environments/test'
-  postmanWorkingDirectory: '$(System.DefaultWorkingDirectory)/automatedtesting/postman'
+  postmanWorkingDirectory: '$(Build.SourcesDirectory)/automatedtesting/postman'
   seleniumWorkingDirectory: '$(System.DefaultWorkingDirectory)/automatedtesting/selenium'
   jmeterWorkingDirectory: '$(System.DefaultWorkingDirectory)/automatedtesting/jmeter/test-suite'
   fakerestapiWorkingDirectory: '$(System.DefaultWorkingDirectory)/automatedtesting/jmeter/fakerestapi'
