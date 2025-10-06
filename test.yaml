@@ -148,7 +148,7 @@ stages:
             testRunTitle: 'Postman Test Suite Results'
 
 # archivefiles
-  - job: ArchiveFiles(Selenium,JMeter,FakeRestAPI) and Publish Artifacts
+  - job: ArchiveFiles_Selenium_JMeter_FakeRestAPI_and_Publish_Artifacts
     steps:
     # Selenium (UI) Test Suite - Archive the package  
     # "ArchiveFiles@2" picks up the web package and archives it.
@@ -158,10 +158,10 @@ stages:
           rootFolderOrFile: '$(seleniumWorkingDirectory)'
           includeRootFolder: false
           archiveType: 'zip'
-          archiveFile: '$(Build.ArtifactStagingDirectory)/uitests.zip'
+          archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-uitests.zip'
 
       # Selenium Test Suite - Publish the package  
-      - publish: $(Build.ArtifactStagingDirectory)/uitests.zip   # Same as the archiveFile artifact above. 
+      - publish: $(Build.ArtifactStagingDirectory)/$(Build.BuildId)-uitests.zip   # Same as the archiveFile artifact above. 
         displayName: 'Upload Package for UI Tests'
         artifact: drop-uitests
 
@@ -172,9 +172,9 @@ stages:
           rootFolderOrFile: '$(fakerestapiWorkingDirectory)' 
           includeRootFolder: false
           archiveType: 'zip'
-          archiveFile: '$(Build.ArtifactStagingDirectory)/fakerestapi.zip'
+          archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-fakerestapi.zip'
 
-      - publish: $(Build.ArtifactStagingDirectory)/fakerestapi.zip
+      - publish: $(Build.ArtifactStagingDirectory)/$(Build.BuildId)-fakerestapi.zip
         displayName: 'Upload Package for FakeRestAPI'
         artifact: drop-fakerestapi
 
@@ -185,10 +185,10 @@ stages:
           rootFolderOrFile: '$(jmeterWorkingDirectory)'
           includeRootFolder: false
           archiveType: 'zip'
-          archiveFile: '$(Build.ArtifactStagingDirectory)/perftests.zip'
+          archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-perftests.zip'
 
       # JMeter Test Suite - Publish    
-      - publish: $(Build.ArtifactStagingDirectory)/perftests.zip
+      - publish: $(Build.ArtifactStagingDirectory)/$(Build.BuildId)-perftests.zip
         displayName: 'Upload Package  for PerformanceTestSuite'
         artifact: drop-perftests
       
@@ -215,7 +215,7 @@ stages:
               azureSubscription: '$(azureServiceConnectionId)' 
               appName: '$(webAppName)'       
               appType: webApp
-              package: $(Pipeline.Workspace)/drop-fakerestapi/fakerestapi.zip       
+              package: $(Pipeline.Workspace)/drop-fakerestapi/$(Build.BuildId)-fakerestapi.zip       
           
           # Run JMeter test suite against the App Service
           #- task: CmdLine@2
@@ -259,7 +259,7 @@ stages:
                 if [ ! -d "$DIR" ]; then
                     mkdir app
                 fi
-                mv /home/mbogolta/azagent/_work/1/drop-uitests/uitests.zip app
+                mv /home/mbogolta/azagent/_work/1/drop-uitests/$(Build.BuildId)-uitests.zip app
                 cd app
                 unzip -o $(Build.BuildId)-uitests.zip
                 FILE=/home/mbogolta/app/chromedriver_linux64.zip
