@@ -132,16 +132,16 @@ stages:
           displayName: Run Data Validation Tests
           continueOnError: true
           inputs:
-            script: 'newman run TestSuite.Data-Validation.json -e Test.environment.json --reporters cli,junit --reporter-junit-export TEST-DataValidation.xml'
-            workingDirectory: "$(postmanWorkingDirectory)"
+            script: newman run TestSuite.Data-Validation.json -e Test.environment.json --reporters cli,junit --reporter-junit-export TEST-DataValidation.xml
+            workingDirectory: $(postmanWorkingDirectory)
 
         # Postman Regression Test Suite    
         - task: CmdLine@2
           displayName: Run Regression Tests
           continueOnError: true
           inputs:
-            script: 'newman run TestSuite.Regression.json -e Test.environment.json --reporters cli,junit --reporter-junit-export TEST-Regression.xml'
-            workingDirectory: '$(postmanWorkingDirectory)'
+            script: newman run TestSuite.Regression.json -e Test.environment.json --reporters cli,junit --reporter-junit-export TEST-Regression.xml
+            workingDirectory: $(postmanWorkingDirectory)
 
         # Postman - Publish TEST Results - JUnit format
         - task: PublishTestResults@2
@@ -151,7 +151,7 @@ stages:
             testResultsFormat: 'JUnit'
             testResultsFiles: '**/TEST-*.xml'
             failTaskOnFailedTests: true
-            searchFolder: '$(postmanWorkingDirectory)'
+            searchFolder: $(postmanWorkingDirectory)
             mergeTestResults: true
             testRunTitle: 'Postman Test Suite Results'
 
