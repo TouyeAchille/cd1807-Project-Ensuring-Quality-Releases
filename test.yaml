@@ -109,7 +109,6 @@ stages:
   - job: CreatePostmanTests
     
     steps:
-        #- checkout: self
       # Postman - Install Newman    
         - task: CmdLine@2
           displayName: Install Newman and JUnitFull reporter
@@ -161,13 +160,12 @@ stages:
   - job: ArchiveFiles_Selenium_JMeter_FakeRestAPI_and_Publish_Artifacts
     
     steps:
-      - checkout: self
     # Selenium (UI) Test Suite - Archive the package  
     # "ArchiveFiles@2" picks up the web package and archives it.
       - script: |
            sudo apt-get update
-           sudo apt-get install -y unzip
-        displayName: 'Install unzip'
+           sudo apt-get install -y unzip zip
+        displayName: 'Install zip/unzip'
      
       - task: ArchiveFiles@2
         displayName: 'Archive UI Tests'
