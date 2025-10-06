@@ -250,7 +250,7 @@ stages:
     environment:
       name:  "webapp-VM"       
       resourceType: VirtualMachine
-      tags: selenium
+      #tags: selenium
     strategy:
       runOnce:
         deploy:
