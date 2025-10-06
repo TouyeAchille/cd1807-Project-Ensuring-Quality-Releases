@@ -107,9 +107,14 @@ stages:
 
 # postman component
   - job: CreatePostmanTests
+    
     steps:
         - checkout: self
-        
+        - script: |
+            echo "System.DefaultWorkingDirectory: $(System.DefaultWorkingDirectory)"
+            ls -R $(System.DefaultWorkingDirectory)
+          displayName: "Debug working directory"
+
       # Postman - Install Newman    
         - task: CmdLine@2
           displayName: Install Newman and JUnitFull reporter
