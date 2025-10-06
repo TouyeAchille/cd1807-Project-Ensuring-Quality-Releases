@@ -113,9 +113,17 @@ stages:
           displayName: Install Newman and JUnitFull reporter
           inputs:
             script: |
-               'sudo npm install -g newman'
-               'echo "Newman version: $(newman --version)"'
-               'sudo npm install -g newman-reporter-junitfull'
+               echo "=== Install Node.js & npm ==="
+               sudo apt-get update -y
+               sudo apt-get install -y nodejs npm
+
+               echo "=== Install Newman & newman-reporter-junitfull ==="
+               sudo npm install -g newman newman-reporter-junitfull
+
+               echo "=== Verify Installation ==="
+               echo "Newman version: $(newman --version)"
+               echo "Node version: $(node -v)"
+               echo "npm version: $(npm -v)"
                
             workingDirectory: $(System.DefaultWorkingDirectory)
 
@@ -152,10 +160,15 @@ stages:
     steps:
     # Selenium (UI) Test Suite - Archive the package  
     # "ArchiveFiles@2" picks up the web package and archives it.
+      - script: |
+           sudo apt-get update
+           sudo apt-get install -y unzip
+        displayName: 'Install unzip'
+     
       - task: ArchiveFiles@2
         displayName: 'Archive UI Tests'
         inputs:
-          rootFolderOrFile: '$(seleniumWorkingDirectory)'
+          rootFolderOrFile: $(seleniumWorkingDirectory)
           includeRootFolder: false
           archiveType: 'zip'
           archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-uitests.zip'
@@ -169,7 +182,7 @@ stages:
       - task: ArchiveFiles@2
         displayName: 'Archive FakeRestAPI'
         inputs:
-          rootFolderOrFile: '$(fakerestapiWorkingDirectory)' 
+          rootFolderOrFile: $(fakerestapiWorkingDirectory)
           includeRootFolder: false
           archiveType: 'zip'
           archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-fakerestapi.zip'
