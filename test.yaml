@@ -14,7 +14,7 @@ variables:
   # Project root folder
   projectRoot: $(System.DefaultWorkingDirectory)
   tfWorkingDirectory: '$(System.DefaultWorkingDirectory)/terraform/environments/test'
-  postmanWorkingDirectory: '$(Build.SourcesDirectory)/automatedtesting/postman'
+  postmanWorkingDirectory: '$(System.DefaultWorkingDirectory)/automatedtesting/postman'
   seleniumWorkingDirectory: '$(System.DefaultWorkingDirectory)/automatedtesting/selenium'
   jmeterWorkingDirectory: '$(System.DefaultWorkingDirectory)/automatedtesting/jmeter/test-suite'
   fakerestapiWorkingDirectory: '$(System.DefaultWorkingDirectory)/automatedtesting/jmeter/fakerestapi'
@@ -108,6 +108,8 @@ stages:
 # postman component
   - job: CreatePostmanTests
     steps:
+        - checkout: self
+        
       # Postman - Install Newman    
         - task: CmdLine@2
           displayName: Install Newman and JUnitFull reporter
@@ -125,7 +127,7 @@ stages:
                echo "Node version: $(node -v)"
                echo "npm version: $(npm -v)"
                
-            workingDirectory: $(System.DefaultWorkingDirectory)
+           #workingDirectory: $(System.DefaultWorkingDirectory)
 
       # Postman Data Validation Test Suite    
         - task: CmdLine@2
