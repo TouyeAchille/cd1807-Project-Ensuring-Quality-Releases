@@ -109,12 +109,7 @@ stages:
   - job: CreatePostmanTests
     
     steps:
-        - checkout: self
-        - script: |
-            echo "System.DefaultWorkingDirectory: $(System.DefaultWorkingDirectory)"
-            ls -R $(System.DefaultWorkingDirectory)
-          displayName: "Debug working directory"
-
+        #- checkout: self
       # Postman - Install Newman    
         - task: CmdLine@2
           displayName: Install Newman and JUnitFull reporter
@@ -164,7 +159,9 @@ stages:
 
 # archivefiles
   - job: ArchiveFiles_Selenium_JMeter_FakeRestAPI_and_Publish_Artifacts
+    
     steps:
+      - checkout: self
     # Selenium (UI) Test Suite - Archive the package  
     # "ArchiveFiles@2" picks up the web package and archives it.
       - script: |
